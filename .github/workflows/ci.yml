@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build and test (unit + 100k-op differential fuzz)
+        run: mvn -B verify
+
+      - name: Benchmark smoke test (100k ops, checks it still runs; numbers on shared runners are not meaningful)
+        run: java -jar target/matching-engine-0.1.0.jar 100000
